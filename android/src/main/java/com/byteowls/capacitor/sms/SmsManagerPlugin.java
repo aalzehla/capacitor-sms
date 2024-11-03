@@ -1,7 +1,9 @@
 package com.byteowls.capacitor.sms;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.annotation.CapacitorPlugin;
@@ -10,8 +12,11 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import org.json.JSONException;
 import androidx.activity.result.ActivityResult;
+import androidx.core.app.ActivityCompat;
+
 import com.getcapacitor.annotation.ActivityCallback;
 import android.content.ActivityNotFoundException;
+import android.telephony.SmsManager;
 import android.util.Log;
 
 import java.util.List;
@@ -72,6 +77,46 @@ public class SmsManagerPlugin extends Plugin {
             Log.e(getLogTag(BASE_LOG_TAG), "Activity not startable!", e);
             call.reject(ERR_SERVICE_NOTFOUND);
         }
+    }
+
+    private void sendSmsB(final PluginCall call) {
+        JSArray numberArray = call.getArray("numbers");
+        List<String> recipientNumbers = null;
+        try {
+            recipientNumbers = numberArray.toList();
+        } catch (JSONException e) {
+            Log.e(getLogTag(BASE_LOG_TAG), "'numbers' json structure not parsable", e);
+        }
+
+        if (recipientNumbers == null || recipientNumbers.isEmpty()) {
+            call.reject(ERR_NO_NUMBERS);
+            return;
+        }
+
+        String text = ConfigUtils.getCallParam(String.class, call, "text");
+        if (text == null || text.length() == 0) {
+            call.reject(ERR_NO_TEXT);
+            return;
+        }
+
+        // Check for SEND_SMS permission
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+            call.reject("Permission SEND_SMS not granted");
+            return;
+        }
+
+        SmsManager smsManager = SmsManager.getDefault();
+        for (String number : recipientNumbers) {
+            try {
+                smsManager.sendTextMessage(number, null, text, null, null);
+            } catch (Exception e) {
+                Log.e(getLogTag(BASE_LOG_TAG), "Failed to send SMS to " + number, e);
+                call.reject("Failed to send SMS to " + number);
+                return;
+            }
+        }
+
+        call.resolve();
     }
 
     @ActivityCallback
