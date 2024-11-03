@@ -38,6 +38,11 @@ public class SmsManagerPlugin extends Plugin {
         sendSms(call);
     }
 
+    @PluginMethod()
+    public void sendB(final PluginCall call) {
+        sendSmsB(call);
+    }
+
     private void sendSms(final PluginCall call) {
         JSArray numberArray = call.getArray("numbers");
         List<String> recipientNumbers = null;
