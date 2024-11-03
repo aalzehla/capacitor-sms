@@ -16,12 +16,13 @@
 # Capacitor SMS plugin
 
 
-Plugin for sending short messages using the device's SMS app.
+Plugin for sending short messages using the device's SMS app, based on https://github.com/moberwasserlechner/capacitor-sms
+
 
 ## Installation
 
 ```bash
-npm i @byteowls/capacitor-sms
+npm i @aalzehla/capacitor-sms
 npx cap sync
 ```
 
@@ -38,7 +39,7 @@ npx cap sync
 
 ```typescript
 import {Component, OnInit} from '@angular/core';
-import {SmsManager} from "@byteowls/capacitor-sms";
+import {SmsManager} from "@aalzehla/capacitor-sms";
 
 
 @Component({

@@ -1,9 +1,9 @@
 {
-    "name": "@byteowls/capacitor-sms",
-    "version": "6.0.0",
+    "name": "@aalzehla/capacitor-sms",
+    "version": "0.0.1",
     "description": "Capacitor SMS plugin",
     "author": "Michael Oberwasserlechner",
-    "homepage": "https://github.com/moberwasserlechner/capacitor-sms",
+    "homepage": "https://github.com/aalzehla/capacitor-sms",
     "license": "MIT",
     "main": "dist/esm/index.js",
     "types": "dist/esm/index.d.ts",
@@ -36,10 +36,10 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/moberwasserlechner/capacitor-sms"
+        "url": "https://github.com/aalzehla/capacitor-sms"
     },
     "bugs": {
-        "url": "https://github.com/moberwasserlechner/capacitor-sms/issues"
+        "url": "https://github.com/aalzehla/capacitor-sms/issues"
     },
     "publishConfig": {
         "access": "public"
