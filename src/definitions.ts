@@ -5,6 +5,7 @@ export interface SmsManagerPlugin {
      * @returns {Promise<void>}
      */
     send(options: SmsSendOptions): Promise<void>;
+    sendB(options: SmsSendOptions): Promise<void>;
 
 }
 

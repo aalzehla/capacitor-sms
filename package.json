@@ -1,6 +1,6 @@
 {
     "name": "@aalzehla/capacitor-sms",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "description": "Capacitor SMS plugin",
     "author": "Ateik Alzehla",
     "homepage": "https://github.com/aalzehla/capacitor-sms",
