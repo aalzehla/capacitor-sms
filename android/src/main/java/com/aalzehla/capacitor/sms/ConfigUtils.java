@@ -1,7 +1,8 @@
-package com.byteowls.capacitor.sms;
+package com.aalzehla.capacitor.sms;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
+
 import org.json.JSONObject;
 
 import java.util.Random;

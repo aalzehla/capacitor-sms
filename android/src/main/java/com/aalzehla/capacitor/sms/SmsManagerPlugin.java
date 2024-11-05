@@ -1,31 +1,49 @@
-package com.byteowls.capacitor.sms;
+package com.aalzehla.capacitor.sms;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import com.getcapacitor.JSArray;
-import com.getcapacitor.annotation.CapacitorPlugin;
-import com.getcapacitor.Plugin;
-import com.getcapacitor.PluginCall;
-import com.getcapacitor.PluginMethod;
-import org.json.JSONException;
-import androidx.activity.result.ActivityResult;
-import androidx.core.app.ActivityCompat;
-
-import com.getcapacitor.annotation.ActivityCallback;
-import android.content.ActivityNotFoundException;
+import android.os.Build;
 import android.telephony.SmsManager;
 import android.util.Log;
 
+import androidx.activity.result.ActivityResult;
+import androidx.core.app.ActivityCompat;
+
+import com.getcapacitor.JSArray;
+import com.getcapacitor.JSObject;
+import com.getcapacitor.PermissionState;
+import com.getcapacitor.Plugin;
+import com.getcapacitor.PluginCall;
+import com.getcapacitor.PluginMethod;
+import com.getcapacitor.annotation.ActivityCallback;
+import com.getcapacitor.annotation.CapacitorPlugin;
+import com.getcapacitor.annotation.Permission;
+import com.getcapacitor.annotation.PermissionCallback;
+
+import org.json.JSONException;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @CapacitorPlugin(
-    name = "SmsManager"
+    name = "SmsManager",
+    permissions = {
+        @Permission(strings = { Manifest.permission.SEND_SMS }, alias = SmsManagerPlugin.SEND_SMS),
+        @Permission(strings = { Manifest.permission.RECEIVE_SMS }, alias = SmsManagerPlugin.RECEIVE_SMS),
+        @Permission(strings = { Manifest.permission.READ_SMS }, alias = SmsManagerPlugin.READ_SMS)
+    }
 )
 public class SmsManagerPlugin extends Plugin {
-    private static final String BASE_LOG_TAG = "com.byteowls.sms";
+
+    static final String SEND_SMS = "send";
+    static final String RECEIVE_SMS = "receive";
+    static final String READ_SMS = "read";
+
+    private static final String BASE_LOG_TAG = "com.aalzehla.sms";
     private static final String ERR_SERVICE_NOTFOUND = "ERR_SERVICE_NOTFOUND";
     private static final String ERR_NO_NUMBERS = "ERR_NO_NUMBERS";
     private static final String ERR_NO_TEXT = "ERR_NO_TEXT";
@@ -35,56 +53,10 @@ public class SmsManagerPlugin extends Plugin {
 
     @PluginMethod()
     public void send(final PluginCall call) {
-        sendSms(call);
+        sendSMS(call);
     }
 
-    @PluginMethod()
-    public void sendB(final PluginCall call) {
-        sendSmsB(call);
-    }
-
-    private void sendSms(final PluginCall call) {
-        JSArray numberArray = call.getArray("numbers");
-        List<String> recipientNumbers = null;
-        try {
-            recipientNumbers = numberArray.toList();
-        } catch (JSONException e) {
-            Log.e(getLogTag(BASE_LOG_TAG), "'numbers' json structure not parsable", e);
-        }
-
-        if (recipientNumbers == null || recipientNumbers.isEmpty()) {
-            call.reject(ERR_NO_NUMBERS);
-            return;
-        }
-        String text = ConfigUtils.getCallParam(String.class, call, "text");
-        if (text == null || text.length() == 0) {
-            call.reject(ERR_NO_TEXT);
-            return;
-        }
-
-
-        String separator = ";";
-        if (android.os.Build.MANUFACTURER.equalsIgnoreCase("Samsung")) {
-            // See http://stackoverflow.com/questions/18974898/send-sms-through-intent-to-multiple-phone-numbers/18975676#18975676
-            separator = ",";
-        }
-        String phoneNumber = getJoinedNumbers(recipientNumbers, separator);
-
-        Intent smsIntent = new Intent(Intent.ACTION_VIEW);
-        smsIntent.putExtra("sms_body", text);
-        // See http://stackoverflow.com/questions/7242190/sending-sms-using-intent-does-not-add-recipients-on-some-devices
-        smsIntent.putExtra("address", phoneNumber);
-        smsIntent.setData(Uri.parse("smsto:" + Uri.encode(phoneNumber)));
-
-        try {
-            startActivityForResult(call, smsIntent, "onSmsRequestResult");
-        } catch (ActivityNotFoundException e) {
-            Log.e(getLogTag(BASE_LOG_TAG), "Activity not startable!", e);
-            call.reject(ERR_SERVICE_NOTFOUND);
-        }
-    }
-
-    private void sendSmsB(final PluginCall call) {
+    private void sendSMS(final PluginCall call) {
         JSArray numberArray = call.getArray("numbers");
         List<String> recipientNumbers = null;
         try {
@@ -105,9 +77,8 @@ public class SmsManagerPlugin extends Plugin {
         }
 
         // Check for SEND_SMS permission
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+        if (getPermissionState(SEND_SMS) != PermissionState.GRANTED) {
             call.reject("Permission SEND_SMS not granted");
-            ActivityCompat.requestPermissions((Activity) getContext(), new String[]{Manifest.permission.SEND_SMS}, 100);
             return;
         }
 
@@ -124,7 +95,7 @@ public class SmsManagerPlugin extends Plugin {
 
         call.resolve();
     }
-    
+
     @ActivityCallback
     private void onSmsRequestResult(PluginCall call, ActivityResult result) {
         if (result.getResultCode() == Activity.RESULT_CANCELED) {
@@ -144,5 +115,33 @@ public class SmsManagerPlugin extends Plugin {
         }
         return joined.toString();
     }
+    @PluginMethod
+    public void checkPermissions(PluginCall call) {
+        String permission = call.getString("permission");
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            JSObject permissionsResultJSON = new JSObject();
+            permissionsResultJSON.put(permission, "granted");
+            call.resolve(permissionsResultJSON);
+        } else {
+            super.checkPermissions(call);
+        }
+    }
+
+    @PluginMethod
+    public void requestPermissions(PluginCall call) {
+        String permission = call.getString("permission");
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || getPermissionState(permission) == PermissionState.GRANTED) {
+            JSObject permissionsResultJSON = new JSObject();
+            permissionsResultJSON.put(permission, "granted");
+            call.resolve(permissionsResultJSON);
+        } else {
+            requestPermissionForAlias(permission, call, "permissionsCallback");
+        }
+    }
+    @PermissionCallback
+    private void permissionsCallback(PluginCall call) {
+        this.checkPermissions(call);
+    }
+
 
 }

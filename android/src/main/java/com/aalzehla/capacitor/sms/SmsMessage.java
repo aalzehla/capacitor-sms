@@ -1,4 +1,4 @@
-package com.byteowls.capacitor.sms;
+package com.aalzehla.capacitor.sms;
 
 import java.util.List;
 
