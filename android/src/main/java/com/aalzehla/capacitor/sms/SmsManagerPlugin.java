@@ -107,7 +107,7 @@ public class SmsManagerPlugin extends Plugin {
         // Check for SEND_SMS permission
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
             call.reject("Permission SEND_SMS not granted");
-            ActivityCompat.requestPermissions(getContext(), new String[]{Manifest.permission.SEND_SMS}, 100);
+            ActivityCompat.requestPermissions((Activity) getContext(), new String[]{Manifest.permission.SEND_SMS}, 100);
             return;
         }
 
@@ -124,7 +124,7 @@ public class SmsManagerPlugin extends Plugin {
 
         call.resolve();
     }
-
+    
     @ActivityCallback
     private void onSmsRequestResult(PluginCall call, ActivityResult result) {
         if (result.getResultCode() == Activity.RESULT_CANCELED) {
