@@ -16,7 +16,7 @@ export interface PermissionStatus {
     read: PermissionState;
 }
 
-export interface SmsManagerPlugin {
+export interface CapacitorSmsPlugin {
     /**
      * Send the sms
      * @param {SmsSendOptions} options

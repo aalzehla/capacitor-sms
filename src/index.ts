@@ -1,9 +1,10 @@
 import { registerPlugin } from '@capacitor/core';
-import { SmsManagerPlugin } from './definitions';
 
-const SmsManager = registerPlugin<SmsManagerPlugin>('SmsManager', {
-    web: () => import('./web').then(m => new m.SmsManagerPluginWeb()),
+import type { CapacitorSmsPlugin } from './definitions';
+
+const CapacitorSms = registerPlugin<CapacitorSmsPlugin>('CapacitorSms', {
+  web: () => import('./web').then(m => new m.CapacitorSmsWeb()),
 });
 
 export * from './definitions';
-export { SmsManager };
+export { CapacitorSms };

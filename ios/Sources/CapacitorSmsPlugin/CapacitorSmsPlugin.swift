@@ -1,0 +1,63 @@
+import Foundation
+import Capacitor
+import MessageUI
+
+typealias JSObject = [String:Any]
+
+@objc(CapacitorSmsPlugin)
+public class CapacitorSmsPlugin: CAPPlugin, CAPBridgedPlugin, MFMessageComposeViewControllerDelegate {
+    public let identifier = "CapacitorSmsPlugin"
+    public let jsName = "CapacitorSms"
+    public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "send", returnType: CAPPluginReturnPromise)
+    ]
+    // private let implementation = CapacitorSms()
+
+    let PARAM_NUMBERS = "numbers"
+    let PARAM_TEXT = "text"
+
+    var pluginCall: CAPPluginCall?
+
+    public func messageComposeViewController(_ controller: MFMessageComposeViewController, didFinishWith result: MessageComposeResult) {
+
+        switch (result.rawValue) {
+        case MessageComposeResult.cancelled.rawValue:
+            self.pluginCall!.reject("SEND_CANCELLED")
+        case MessageComposeResult.failed.rawValue:
+            self.pluginCall!.reject("ERR_SEND_FAILED")
+        case MessageComposeResult.sent.rawValue:
+            self.pluginCall!.resolve()
+        default:
+            self.pluginCall!.reject("ERR_SEND_UNKNOWN_STATE")
+        }
+        controller.dismiss(animated: true, completion: nil)
+    }
+
+    @objc func send(_ call: CAPPluginCall) {
+        self.pluginCall = call
+        guard let numbers = call.getArray(PARAM_NUMBERS, String.self) else {
+            call.reject("ERR_NO_NUMBERS")
+            return
+        }
+        guard let text = call.getString(PARAM_TEXT) else {
+            call.reject("ERR_NO_TEXT")
+            return
+        }
+
+        if !MFMessageComposeViewController.canSendText() {
+            call.reject("ERR_SERVICE_NOTFOUND")
+            return
+        }
+
+        // Present the view controller modally.
+        DispatchQueue.main.async {
+            let composeVC = MFMessageComposeViewController()
+            composeVC.messageComposeDelegate = self
+            // Configure the fields of the interface.
+            composeVC.recipients = numbers
+            composeVC.body = text
+            // Update UI
+            self.bridge?.viewController?.present(composeVC, animated: true, completion: nil);
+        }
+    }
+}
