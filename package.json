@@ -1,5 +1,5 @@
 {
-  "name": "capacitor-sms",
+  "name": "@aalzehla/capacitor-sms",
   "version": "0.1.0",
   "description": "Capacitor SMS plugin",
   "main": "dist/plugin.cjs.js",
