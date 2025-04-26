@@ -31,9 +31,9 @@ import java.util.List;
 @CapacitorPlugin(
     name = "CapacitorSms",
     permissions = {
-        @Permission(strings = { Manifest.permission.SEND_SMS }, alias = SmsManagerPlugin.SEND_SMS),
-        @Permission(strings = { Manifest.permission.RECEIVE_SMS }, alias = SmsManagerPlugin.RECEIVE_SMS),
-        @Permission(strings = { Manifest.permission.READ_SMS }, alias = SmsManagerPlugin.READ_SMS)
+        @Permission(strings = { Manifest.permission.SEND_SMS }, alias = CapacitorSmsPlugin.SEND_SMS),
+        @Permission(strings = { Manifest.permission.RECEIVE_SMS }, alias = CapacitorSmsPlugin.RECEIVE_SMS),
+        @Permission(strings = { Manifest.permission.READ_SMS }, alias = CapacitorSmsPlugin.READ_SMS)
     }
 
 )
@@ -50,7 +50,7 @@ public class CapacitorSmsPlugin extends Plugin {
 
     private CapacitorSms implementation = new CapacitorSms();
 
-    public SmsManagerPlugin() {}
+    public CapacitorSmsPlugin() {}
 
     @PluginMethod()
     public void send(final PluginCall call) {
