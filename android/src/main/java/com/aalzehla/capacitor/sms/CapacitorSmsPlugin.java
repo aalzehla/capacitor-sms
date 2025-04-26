@@ -48,8 +48,6 @@ public class CapacitorSmsPlugin extends Plugin {
     private static final String ERR_NO_TEXT = "ERR_NO_TEXT";
     private static final String SEND_CANCELLED = "SEND_CANCELLED";
 
-    private CapacitorSms implementation = new CapacitorSms();
-
     public CapacitorSmsPlugin() {}
 
     @PluginMethod()

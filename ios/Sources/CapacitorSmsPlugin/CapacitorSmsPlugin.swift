@@ -11,7 +11,6 @@ public class CapacitorSmsPlugin: CAPPlugin, CAPBridgedPlugin, MFMessageComposeVi
     public let pluginMethods: [CAPPluginMethod] = [
         CAPPluginMethod(name: "send", returnType: CAPPluginReturnPromise)
     ]
-    // private let implementation = CapacitorSms()
 
     let PARAM_NUMBERS = "numbers"
     let PARAM_TEXT = "text"
